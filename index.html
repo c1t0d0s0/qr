@@ -20,37 +20,50 @@
         gtag('config', GTM_ID);
       }
     </script>
+    <!-- Theme initialization -->
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('qr_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      })();
+    </script>
 </head>
 <body>
     <div class="container">
         <header class="app-header">
-            <h1>QR Code Generator</h1>
+            <div class="header-top">
+                <h1>QR Code Generator</h1>
+                <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="ライトモードに切り替え" title="ライトモードに切り替え">
+                    <span class="theme-icon theme-icon-light" aria-hidden="true">☀️</span>
+                    <span class="theme-icon theme-icon-dark" aria-hidden="true">🌙</span>
+                </button>
+            </div>
             <p class="subtitle">URL、テキスト、Wi-Fi、連絡先などのQRコードを簡単に作成</p>
         </header>
 
         <!-- タイプ選択タブ -->
-        <nav class="type-tabs" aria-label="QR Code Type">
-            <button type="button" class="tab-btn active" data-type="url">
+        <nav class="type-tabs" role="tablist" aria-label="QR Code Type">
+            <button type="button" class="tab-btn active" data-type="url" role="tab" aria-selected="true" id="tab-url" aria-controls="content-url">
                 <span class="tab-icon">🌐</span>
                 <span class="tab-label">URL</span>
             </button>
-            <button type="button" class="tab-btn" data-type="text">
+            <button type="button" class="tab-btn" data-type="text" role="tab" aria-selected="false" id="tab-text" aria-controls="content-text">
                 <span class="tab-icon">📝</span>
                 <span class="tab-label">テキスト</span>
             </button>
-            <button type="button" class="tab-btn" data-type="wifi">
+            <button type="button" class="tab-btn" data-type="wifi" role="tab" aria-selected="false" id="tab-wifi" aria-controls="content-wifi">
                 <span class="tab-icon">📶</span>
                 <span class="tab-label">Wi-Fi</span>
             </button>
-            <button type="button" class="tab-btn" data-type="email">
+            <button type="button" class="tab-btn" data-type="email" role="tab" aria-selected="false" id="tab-email" aria-controls="content-email">
                 <span class="tab-icon">✉️</span>
                 <span class="tab-label">メール</span>
             </button>
-            <button type="button" class="tab-btn" data-type="phone">
+            <button type="button" class="tab-btn" data-type="phone" role="tab" aria-selected="false" id="tab-phone" aria-controls="content-phone">
                 <span class="tab-icon">📞</span>
                 <span class="tab-label">電話</span>
             </button>
-            <button type="button" class="tab-btn" data-type="vcard">
+            <button type="button" class="tab-btn" data-type="vcard" role="tab" aria-selected="false" id="tab-vcard" aria-controls="content-vcard">
                 <span class="tab-icon">📇</span>
                 <span class="tab-label">連絡先</span>
             </button>
@@ -59,7 +72,7 @@
         <!-- メインフォーム -->
         <form id="qr-form">
             <!-- 1. URL フォーム -->
-            <div class="tab-content active" id="content-url">
+            <div class="tab-content active" id="content-url" role="tabpanel" aria-labelledby="tab-url">
                 <div class="form-group">
                     <label for="url-input">URL <span class="required">*</span></label>
                     <input type="url" id="url-input" placeholder="https://example.com" required>
@@ -71,7 +84,7 @@
             </div>
 
             <!-- 2. テキスト フォーム -->
-            <div class="tab-content" id="content-text">
+            <div class="tab-content" id="content-text" role="tabpanel" aria-labelledby="tab-text">
                 <div class="form-group">
                     <label for="text-input">テキスト <span class="required">*</span></label>
                     <textarea id="text-input" rows="4" placeholder="QRコードに変換したいテキストを入力してください"></textarea>
@@ -83,7 +96,7 @@
             </div>
 
             <!-- 3. Wi-Fi フォーム -->
-            <div class="tab-content" id="content-wifi">
+            <div class="tab-content" id="content-wifi" role="tabpanel" aria-labelledby="tab-wifi">
                 <div class="form-group">
                     <label for="wifi-ssid">SSID (ネットワーク名) <span class="required">*</span></label>
                     <input type="text" id="wifi-ssid" placeholder="Wi-FiのSSID">
@@ -111,7 +124,7 @@
             </div>
 
             <!-- 4. メール フォーム -->
-            <div class="tab-content" id="content-email">
+            <div class="tab-content" id="content-email" role="tabpanel" aria-labelledby="tab-email">
                 <div class="form-group">
                     <label for="email-to">宛先メールアドレス <span class="required">*</span></label>
                     <input type="email" id="email-to" placeholder="info@example.com">
@@ -131,7 +144,7 @@
             </div>
 
             <!-- 5. 電話 フォーム -->
-            <div class="tab-content" id="content-phone">
+            <div class="tab-content" id="content-phone" role="tabpanel" aria-labelledby="tab-phone">
                 <div class="form-group">
                     <label for="phone-number">電話番号 <span class="required">*</span></label>
                     <input type="tel" id="phone-number" placeholder="09012345678 または +819012345678">
@@ -143,7 +156,7 @@
             </div>
 
             <!-- 6. 連絡先 (vCard) フォーム -->
-            <div class="tab-content" id="content-vcard">
+            <div class="tab-content" id="content-vcard" role="tabpanel" aria-labelledby="tab-vcard">
                 <div class="form-row">
                     <div class="form-group col">
                         <label for="vcard-lastname">姓 <span class="required">*</span></label>

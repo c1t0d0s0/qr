@@ -10,10 +10,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.getElementById('toast');
     const wifiAuthSelect = document.getElementById('wifi-auth');
     const wifiPasswordInput = document.getElementById('wifi-password');
+    const themeToggleBtn = document.getElementById('theme-toggle');
 
     let currentType = 'url';
     let currentCanvas = null;
     let toastTimeout = null;
+
+    // テーマ切り替え機能
+    const updateThemeToggleUI = (theme) => {
+        if (!themeToggleBtn) return;
+        const nextThemeText = theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え';
+        themeToggleBtn.setAttribute('aria-label', nextThemeText);
+        themeToggleBtn.setAttribute('title', nextThemeText);
+    };
+
+    const setTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
+        try {
+            localStorage.setItem('qr_theme', theme);
+        } catch (e) {
+            console.warn('Failed to save theme to localStorage', e);
+        }
+        updateThemeToggleUI(theme);
+    };
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const activeTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+    }
+
+    // 初期表示時のボタンUI同期
+    const initialTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    updateThemeToggleUI(initialTheme);
 
     // タブ必須項目のマッピング
     const requiredInputs = {
@@ -47,10 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetType = btn.getAttribute('data-type');
             if (targetType === currentType) return;
 
-            tabButtons.forEach(b => b.classList.remove('active'));
+            tabButtons.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
             tabContents.forEach(c => c.classList.remove('active'));
 
             btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
             const targetContent = document.getElementById(`content-${targetType}`);
             if (targetContent) {
                 targetContent.classList.add('active');
