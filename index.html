@@ -219,6 +219,125 @@
                 </div>
             </div>
 
+            <!-- デザインカスタマイズ アコーディオン -->
+            <details class="design-accordion" id="design-accordion">
+                <summary class="design-accordion-summary">
+                    <span class="summary-left">
+                        <span class="summary-icon">🎨</span>
+                        <span class="summary-title" data-i18n="design.customizeTitle">デザインをカスタマイズ</span>
+                    </span>
+                    <span class="summary-badge" id="preset-badge" data-i18n="design.presetClassic">Classic</span>
+                </summary>
+
+                <div class="design-panel">
+                    <!-- 1. プリセット -->
+                    <div class="design-section">
+                        <label class="design-section-label" data-i18n="design.presetsLabel">デザインプリセット</label>
+                        <div class="preset-grid">
+                            <button type="button" class="preset-btn active" data-preset="classic" title="Classic Black">
+                                <span class="preset-preview preset-classic"></span>
+                                <span class="preset-name" data-i18n="design.presetClassic">Classic</span>
+                            </button>
+                            <button type="button" class="preset-btn" data-preset="ocean" title="Ocean Blue">
+                                <span class="preset-preview preset-ocean"></span>
+                                <span class="preset-name" data-i18n="design.presetOcean">Ocean</span>
+                            </button>
+                            <button type="button" class="preset-btn" data-preset="sunset" title="Sunset Glow">
+                                <span class="preset-preview preset-sunset"></span>
+                                <span class="preset-name" data-i18n="design.presetSunset">Sunset</span>
+                            </button>
+                            <button type="button" class="preset-btn" data-preset="emerald" title="Emerald Nature">
+                                <span class="preset-preview preset-emerald"></span>
+                                <span class="preset-name" data-i18n="design.presetEmerald">Emerald</span>
+                            </button>
+                            <button type="button" class="preset-btn" data-preset="cyber" title="Cyber Purple">
+                                <span class="preset-preview preset-cyber"></span>
+                                <span class="preset-name" data-i18n="design.presetCyber">Cyber</span>
+                            </button>
+                            <button type="button" class="preset-btn" data-preset="rose" title="Rose Gold">
+                                <span class="preset-preview preset-rose"></span>
+                                <span class="preset-name" data-i18n="design.presetRose">Rose</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. ドット & アイの形状 -->
+                    <div class="design-row">
+                        <div class="design-col">
+                            <label class="design-section-label" data-i18n="design.dotStyleLabel">ドット形状</label>
+                            <div class="segmented-control" id="dot-style-control">
+                                <button type="button" class="segment-btn active" data-dot="square" data-i18n="design.dotSquare">四角</button>
+                                <button type="button" class="segment-btn" data-dot="rounded" data-i18n="design.dotRounded">角丸</button>
+                                <button type="button" class="segment-btn" data-dot="dots" data-i18n="design.dotCircle">ドット</button>
+                            </div>
+                        </div>
+                        <div class="design-col">
+                            <label class="design-section-label" data-i18n="design.eyeStyleLabel">アイ(目)の形状</label>
+                            <div class="segmented-control" id="eye-style-control">
+                                <button type="button" class="segment-btn active" data-eye="square" data-i18n="design.eyeSquare">四角</button>
+                                <button type="button" class="segment-btn" data-eye="rounded" data-i18n="design.eyeRounded">角丸</button>
+                                <button type="button" class="segment-btn" data-eye="circle" data-i18n="design.eyeCircle">円形</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. カラー設定 -->
+                    <div class="design-section">
+                        <div class="design-section-header">
+                            <label class="design-section-label" data-i18n="design.colorLabel">カラー設定</label>
+                            <div class="color-type-toggle">
+                                <button type="button" class="color-type-btn active" id="color-type-solid" data-type="solid" data-i18n="design.colorSolid">単色</button>
+                                <button type="button" class="color-type-btn" id="color-type-gradient" data-type="gradient" data-i18n="design.colorGradient">グラデーション</button>
+                            </div>
+                        </div>
+                        
+                        <div class="color-inputs-grid">
+                            <div class="color-input-group">
+                                <label for="color-fg1" id="label-fg1" data-i18n="design.fgColor">前景色</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="color-fg1" value="#000000" class="color-picker">
+                                    <input type="text" id="color-fg1-hex" value="#000000" class="color-hex-input" maxlength="7">
+                                </div>
+                            </div>
+
+                            <div class="color-input-group" id="group-fg2" style="display: none;">
+                                <label for="color-fg2" data-i18n="design.fgColor2">終了色</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="color-fg2" value="#0284c7" class="color-picker">
+                                    <input type="text" id="color-fg2-hex" value="#0284c7" class="color-hex-input" maxlength="7">
+                                </div>
+                            </div>
+
+                            <div class="color-input-group">
+                                <label for="color-bg" data-i18n="design.bgColor">背景色</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="color-bg" value="#ffffff" class="color-picker">
+                                    <input type="text" id="color-bg-hex" value="#ffffff" class="color-hex-input" maxlength="7">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 中央ロゴ / アイコン -->
+                    <div class="design-section">
+                        <label class="design-section-label" data-i18n="design.logoLabel">中央ロゴ / アイコン</label>
+                        <div class="logo-options">
+                            <div class="segmented-control" id="logo-type-control">
+                                <button type="button" class="segment-btn active" data-logo="none" data-i18n="design.logoNone">なし</button>
+                                <button type="button" class="segment-btn" data-logo="icon" data-i18n="design.logoIcon">タイプアイコン</button>
+                                <button type="button" class="segment-btn" data-logo="custom" data-i18n="design.logoUpload">画像アップロード</button>
+                            </div>
+                            <div id="custom-logo-upload-group" class="custom-logo-upload-group" style="display: none;">
+                                <label for="custom-logo-file" class="file-upload-btn" data-i18n="design.chooseImage">画像を選択...</label>
+                                <input type="file" id="custom-logo-file" accept="image/*" class="file-input-hidden">
+                                <span id="custom-logo-filename" class="custom-logo-filename"></span>
+                                <button type="button" id="custom-logo-clear" class="custom-logo-clear-btn" style="display: none;" title="クリア">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
             <button type="submit" class="submit-btn" id="generate-btn" data-i18n="buttons.generate">QRコードを生成</button>
         </form>
 

@@ -98,6 +98,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 copyFailed: '画像のコピーに失敗しました',
                 copyUnsupported: 'お使いのブラウザは画像コピーに対応していません',
                 copyPermissionDenied: 'クリップボードへのアクセスが許可されていません'
+            },
+            design: {
+                customizeTitle: 'デザインをカスタマイズ',
+                presetsLabel: 'デザインプリセット',
+                presetClassic: 'Classic',
+                presetOcean: 'Ocean',
+                presetSunset: 'Sunset',
+                presetEmerald: 'Emerald',
+                presetCyber: 'Cyber',
+                presetRose: 'Rose',
+                dotStyleLabel: 'ドット形状',
+                dotSquare: '四角',
+                dotRounded: '角丸',
+                dotCircle: 'ドット',
+                eyeStyleLabel: 'アイ(目)の形状',
+                eyeSquare: '四角',
+                eyeRounded: '角丸',
+                eyeCircle: '円形',
+                colorLabel: 'カラー設定',
+                colorSolid: '単色',
+                colorGradient: 'グラデーション',
+                fgColor: '前景色',
+                fgColor2: '終了色',
+                bgColor: '背景色',
+                logoLabel: '中央ロゴ / アイコン',
+                logoNone: 'なし',
+                logoIcon: 'タイプアイコン',
+                logoUpload: '画像アップロード',
+                chooseImage: '画像を選択...'
             }
         },
         en: {
@@ -179,6 +208,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 copyFailed: 'Failed to copy image',
                 copyUnsupported: 'Your browser does not support copying images',
                 copyPermissionDenied: 'Clipboard access was denied'
+            },
+            design: {
+                customizeTitle: 'Customize Design',
+                presetsLabel: 'Design Presets',
+                presetClassic: 'Classic',
+                presetOcean: 'Ocean',
+                presetSunset: 'Sunset',
+                presetEmerald: 'Emerald',
+                presetCyber: 'Cyber',
+                presetRose: 'Rose',
+                dotStyleLabel: 'Dot Style',
+                dotSquare: 'Square',
+                dotRounded: 'Rounded',
+                dotCircle: 'Dots',
+                eyeStyleLabel: 'Corner Eye Style',
+                eyeSquare: 'Square',
+                eyeRounded: 'Rounded',
+                eyeCircle: 'Circle',
+                colorLabel: 'Color Settings',
+                colorSolid: 'Solid',
+                colorGradient: 'Gradient',
+                fgColor: 'Foreground',
+                fgColor2: 'End Color',
+                bgColor: 'Background',
+                logoLabel: 'Center Logo / Icon',
+                logoNone: 'None',
+                logoIcon: 'Type Icon',
+                logoUpload: 'Upload Image',
+                chooseImage: 'Choose image...'
             }
         }
     };
@@ -253,6 +311,493 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // デザインプリセット
+    const PRESETS = {
+        classic: {
+            name: 'Classic',
+            dotStyle: 'square',
+            eyeStyle: 'square',
+            colorType: 'solid',
+            fgColor1: '#000000',
+            fgColor2: '#000000',
+            bgColor: '#ffffff'
+        },
+        ocean: {
+            name: 'Ocean',
+            dotStyle: 'rounded',
+            eyeStyle: 'rounded',
+            colorType: 'gradient',
+            fgColor1: '#0284c7',
+            fgColor2: '#38bdf8',
+            bgColor: '#ffffff'
+        },
+        sunset: {
+            name: 'Sunset',
+            dotStyle: 'dots',
+            eyeStyle: 'circle',
+            colorType: 'gradient',
+            fgColor1: '#ea580c',
+            fgColor2: '#f43f5e',
+            bgColor: '#ffffff'
+        },
+        emerald: {
+            name: 'Emerald',
+            dotStyle: 'rounded',
+            eyeStyle: 'rounded',
+            colorType: 'gradient',
+            fgColor1: '#059669',
+            fgColor2: '#10b981',
+            bgColor: '#ffffff'
+        },
+        cyber: {
+            name: 'Cyber',
+            dotStyle: 'dots',
+            eyeStyle: 'rounded',
+            colorType: 'gradient',
+            fgColor1: '#7c3aed',
+            fgColor2: '#ec4899',
+            bgColor: '#ffffff'
+        },
+        rose: {
+            name: 'Rose',
+            dotStyle: 'rounded',
+            eyeStyle: 'circle',
+            colorType: 'gradient',
+            fgColor1: '#be123c',
+            fgColor2: '#fb7185',
+            bgColor: '#ffffff'
+        }
+    };
+
+    const TYPE_ICONS = {
+        url: '🌐',
+        text: '📝',
+        wifi: '📶',
+        email: '✉️',
+        phone: '📞',
+        vcard: '📇'
+    };
+
+    const designOptions = {
+        preset: 'classic',
+        dotStyle: 'square',
+        eyeStyle: 'square',
+        colorType: 'solid',
+        fgColor1: '#000000',
+        fgColor2: '#0284c7',
+        bgColor: '#ffffff',
+        logoType: 'none',
+        customLogoImage: null
+    };
+
+    let lastGeneratedQRModel = null;
+    let lastGeneratedLabel = '';
+
+    // 角丸矩形パス描画ヘルパー
+    const addRoundRectPath = (ctx, x, y, width, height, radius) => {
+        if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(x, y, width, height, radius);
+            return;
+        }
+        const r = Math.min(radius, width / 2, height / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + width, y, x + width, y + height, r);
+        ctx.arcTo(x + width, y + height, x, y + height, r);
+        ctx.arcTo(x, y + height, x, y, r);
+        ctx.arcTo(x, y, x + width, y, r);
+        ctx.closePath();
+    };
+
+    // ファインダパターン（目）の領域判定
+    const isFinderArea = (r, c, count) => {
+        return (r < 7 && c < 7) || (r < 7 && c >= count - 7) || (r >= count - 7 && c < 7);
+    };
+
+    // テキストを描画可能な長さに省略するヘルパー
+    const truncateText = (ctx, text, maxWidth) => {
+        if (ctx.measureText(text).width <= maxWidth) {
+            return text;
+        }
+        let truncated = text;
+        while (truncated.length > 0 && ctx.measureText(truncated + '...').width > maxWidth) {
+            truncated = truncated.slice(0, -1);
+        }
+        return truncated + '...';
+    };
+
+    // カスタムQRコード描画エンジン
+    const renderCustomQRCode = (qrModel, options, labelText, activeType) => {
+        const count = qrModel.getModuleCount();
+        const cellSize = 10;
+        const qrSize = count * cellSize;
+        const padding = 20;
+        const hasLabel = labelText && labelText.length > 0;
+        const labelHeight = hasLabel ? 40 : 0;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = qrSize + (padding * 2);
+        canvas.height = qrSize + labelHeight + (padding * 2);
+        const ctx = canvas.getContext('2d');
+
+        // 背景塗りつぶし
+        if (options.bgColor) {
+            ctx.fillStyle = options.bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // 上部ラベル描画
+        if (hasLabel) {
+            ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+            ctx.fillStyle = '#1e293b';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const maxLabelWidth = canvas.width - (padding * 2);
+            const displayLabel = truncateText(ctx, labelText, maxLabelWidth);
+            ctx.fillText(displayLabel, canvas.width / 2, padding + (labelHeight / 2));
+        }
+
+        const originX = padding;
+        const originY = padding + labelHeight;
+
+        // 前景色・グラデーション設定
+        let fillStyle = options.fgColor1;
+        if (options.colorType === 'gradient') {
+            const grad = ctx.createLinearGradient(originX, originY, originX + qrSize, originY + qrSize);
+            grad.addColorStop(0, options.fgColor1);
+            grad.addColorStop(1, options.fgColor2);
+            fillStyle = grad;
+        }
+
+        ctx.fillStyle = fillStyle;
+        ctx.strokeStyle = fillStyle;
+
+        // 中央ロゴ領域の判定
+        const hasLogo = options.logoType === 'icon' || (options.logoType === 'custom' && options.customLogoImage);
+        let centerStart = -1, centerEnd = -1;
+        if (hasLogo) {
+            const centerCells = Math.max(5, Math.floor(count * 0.22));
+            centerStart = Math.floor((count - centerCells) / 2);
+            centerEnd = centerStart + centerCells;
+        }
+
+        // 1. データドット描画
+        for (let r = 0; r < count; r++) {
+            for (let c = 0; c < count; c++) {
+                if (isFinderArea(r, c, count)) continue;
+                if (hasLogo && r >= centerStart && r < centerEnd && c >= centerStart && c < centerEnd) continue;
+
+                if (qrModel.isDark(r, c)) {
+                    const x = originX + (c * cellSize);
+                    const y = originY + (r * cellSize);
+
+                    if (options.dotStyle === 'dots') {
+                        ctx.beginPath();
+                        ctx.arc(x + cellSize / 2, y + cellSize / 2, cellSize * 0.42, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (options.dotStyle === 'rounded') {
+                        addRoundRectPath(ctx, x + cellSize * 0.08, y + cellSize * 0.08, cellSize * 0.84, cellSize * 0.84, cellSize * 0.32);
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(x, y, cellSize, cellSize);
+                    }
+                }
+            }
+        }
+
+        // 2. ファインダパターン（アイ）描画
+        const eyeLocations = [
+            { r: 0, c: 0 },
+            { r: 0, c: count - 7 },
+            { r: count - 7, c: 0 }
+        ];
+
+        eyeLocations.forEach(loc => {
+            const x = originX + (loc.c * cellSize);
+            const y = originY + (loc.r * cellSize);
+            const size = 7 * cellSize;
+
+            if (options.eyeStyle === 'circle') {
+                const cx = x + size / 2;
+                const cy = y + size / 2;
+                // 外枠
+                ctx.lineWidth = cellSize;
+                ctx.beginPath();
+                ctx.arc(cx, cy, (size - cellSize) / 2, 0, Math.PI * 2);
+                ctx.stroke();
+                // 芯
+                ctx.beginPath();
+                ctx.arc(cx, cy, 1.5 * cellSize, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (options.eyeStyle === 'rounded') {
+                // 外枠
+                ctx.lineWidth = cellSize;
+                addRoundRectPath(ctx, x + cellSize / 2, y + cellSize / 2, size - cellSize, size - cellSize, cellSize * 1.4);
+                ctx.stroke();
+                // 芯
+                addRoundRectPath(ctx, x + 2 * cellSize, y + 2 * cellSize, 3 * cellSize, 3 * cellSize, cellSize * 0.8);
+                ctx.fill();
+            } else {
+                // 四角アイ
+                ctx.lineWidth = cellSize;
+                ctx.strokeRect(x + cellSize / 2, y + cellSize / 2, size - cellSize, size - cellSize);
+                ctx.fillRect(x + 2 * cellSize, y + 2 * cellSize, 3 * cellSize, 3 * cellSize);
+            }
+        });
+
+        // 3. 中央ロゴ描画
+        if (hasLogo) {
+            const logoAreaSize = (centerEnd - centerStart) * cellSize;
+            const logoCenterX = originX + (centerStart * cellSize) + (logoAreaSize / 2);
+            const logoCenterY = originY + (centerStart * cellSize) + (logoAreaSize / 2);
+            const bgSize = logoAreaSize + (cellSize * 0.6);
+
+            // 背景プレート
+            ctx.save();
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 6;
+            addRoundRectPath(ctx, logoCenterX - (bgSize / 2), logoCenterY - (bgSize / 2), bgSize, bgSize, bgSize * 0.22);
+            ctx.fill();
+            ctx.restore();
+
+            if (options.logoType === 'icon') {
+                const icon = TYPE_ICONS[activeType] || '🌐';
+                ctx.font = `${Math.floor(logoAreaSize * 0.62)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(icon, logoCenterX, logoCenterY);
+            } else if (options.logoType === 'custom' && options.customLogoImage) {
+                const img = options.customLogoImage;
+                const maxDim = logoAreaSize * 0.78;
+                let drawW = maxDim;
+                let drawH = maxDim;
+                if (img.width && img.height) {
+                    if (img.width > img.height) {
+                        drawH = maxDim * (img.height / img.width);
+                    } else {
+                        drawW = maxDim * (img.width / img.height);
+                    }
+                }
+                ctx.drawImage(img, logoCenterX - (drawW / 2), logoCenterY - (drawH / 2), drawW, drawH);
+            }
+        }
+
+        return canvas;
+    };
+
+    // 既存QRのリアルタイム再描画
+    const refreshCurrentQR = () => {
+        if (!lastGeneratedQRModel) return;
+        qrCodeDiv.innerHTML = '';
+        const finalCanvas = renderCustomQRCode(lastGeneratedQRModel, designOptions, lastGeneratedLabel, currentType);
+        qrCodeDiv.appendChild(finalCanvas);
+        currentCanvas = finalCanvas;
+    };
+
+    // デザインUI要素の同期
+    const updateDesignUI = () => {
+        // プリセットボタン
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-preset') === designOptions.preset);
+        });
+
+        // プリセットバッジ
+        const badgeEl = document.getElementById('preset-badge');
+        if (badgeEl) {
+            const t = i18n[currentLang] || i18n.en;
+            const presetKey = 'preset' + designOptions.preset.charAt(0).toUpperCase() + designOptions.preset.slice(1);
+            badgeEl.textContent = (t.design && t.design[presetKey]) ? t.design[presetKey] : designOptions.preset;
+        }
+
+        // ドット形状
+        document.querySelectorAll('#dot-style-control .segment-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-dot') === designOptions.dotStyle);
+        });
+
+        // アイ形状
+        document.querySelectorAll('#eye-style-control .segment-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-eye') === designOptions.eyeStyle);
+        });
+
+        // カラータイプ
+        const solidBtn = document.getElementById('color-type-solid');
+        const gradBtn = document.getElementById('color-type-gradient');
+        const groupFg2 = document.getElementById('group-fg2');
+        if (solidBtn && gradBtn && groupFg2) {
+            const isGrad = designOptions.colorType === 'gradient';
+            solidBtn.classList.toggle('active', !isGrad);
+            gradBtn.classList.toggle('active', isGrad);
+            groupFg2.style.display = isGrad ? 'block' : 'none';
+        }
+
+        // カラー入力値
+        const colorFg1 = document.getElementById('color-fg1');
+        const colorFg1Hex = document.getElementById('color-fg1-hex');
+        const colorFg2 = document.getElementById('color-fg2');
+        const colorFg2Hex = document.getElementById('color-fg2-hex');
+        const colorBg = document.getElementById('color-bg');
+        const colorBgHex = document.getElementById('color-bg-hex');
+
+        if (colorFg1) colorFg1.value = designOptions.fgColor1;
+        if (colorFg1Hex) colorFg1Hex.value = designOptions.fgColor1.toUpperCase();
+        if (colorFg2) colorFg2.value = designOptions.fgColor2;
+        if (colorFg2Hex) colorFg2Hex.value = designOptions.fgColor2.toUpperCase();
+        if (colorBg) colorBg.value = designOptions.bgColor;
+        if (colorBgHex) colorBgHex.value = designOptions.bgColor.toUpperCase();
+
+        // ロゴタイプ
+        document.querySelectorAll('#logo-type-control .segment-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-logo') === designOptions.logoType);
+        });
+        const uploadGroup = document.getElementById('custom-logo-upload-group');
+        if (uploadGroup) {
+            uploadGroup.style.display = designOptions.logoType === 'custom' ? 'flex' : 'none';
+        }
+    };
+
+    // プリセット適用
+    const applyPreset = (presetName) => {
+        const p = PRESETS[presetName];
+        if (!p) return;
+        designOptions.preset = presetName;
+        designOptions.dotStyle = p.dotStyle;
+        designOptions.eyeStyle = p.eyeStyle;
+        designOptions.colorType = p.colorType;
+        designOptions.fgColor1 = p.fgColor1;
+        designOptions.fgColor2 = p.fgColor2;
+        designOptions.bgColor = p.bgColor;
+
+        updateDesignUI();
+        refreshCurrentQR();
+    };
+
+    // デザインイベントリスナーの設定
+    const setupDesignListeners = () => {
+        // プリセットクリック
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const presetName = btn.getAttribute('data-preset');
+                applyPreset(presetName);
+            });
+        });
+
+        // ドット形状
+        document.querySelectorAll('#dot-style-control .segment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                designOptions.dotStyle = btn.getAttribute('data-dot');
+                designOptions.preset = 'custom';
+                updateDesignUI();
+                refreshCurrentQR();
+            });
+        });
+
+        // アイ形状
+        document.querySelectorAll('#eye-style-control .segment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                designOptions.eyeStyle = btn.getAttribute('data-eye');
+                designOptions.preset = 'custom';
+                updateDesignUI();
+                refreshCurrentQR();
+            });
+        });
+
+        // カラータイプ切り替え
+        const solidBtn = document.getElementById('color-type-solid');
+        const gradBtn = document.getElementById('color-type-gradient');
+        if (solidBtn && gradBtn) {
+            solidBtn.addEventListener('click', () => {
+                designOptions.colorType = 'solid';
+                designOptions.preset = 'custom';
+                updateDesignUI();
+                refreshCurrentQR();
+            });
+            gradBtn.addEventListener('click', () => {
+                designOptions.colorType = 'gradient';
+                designOptions.preset = 'custom';
+                updateDesignUI();
+                refreshCurrentQR();
+            });
+        }
+
+        // カラーピッカー & HEX
+        const bindColorInput = (pickerId, hexId, key) => {
+            const picker = document.getElementById(pickerId);
+            const hex = document.getElementById(hexId);
+            if (!picker || !hex) return;
+
+            picker.addEventListener('input', () => {
+                designOptions[key] = picker.value;
+                hex.value = picker.value.toUpperCase();
+                designOptions.preset = 'custom';
+                updateDesignUI();
+                refreshCurrentQR();
+            });
+
+            hex.addEventListener('change', () => {
+                let val = hex.value.trim();
+                if (!val.startsWith('#')) val = '#' + val;
+                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                    designOptions[key] = val;
+                    picker.value = val;
+                    designOptions.preset = 'custom';
+                    updateDesignUI();
+                    refreshCurrentQR();
+                }
+            });
+        };
+
+        bindColorInput('color-fg1', 'color-fg1-hex', 'fgColor1');
+        bindColorInput('color-fg2', 'color-fg2-hex', 'fgColor2');
+        bindColorInput('color-bg', 'color-bg-hex', 'bgColor');
+
+        // ロゴタイプ
+        document.querySelectorAll('#logo-type-control .segment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                designOptions.logoType = btn.getAttribute('data-logo');
+                updateDesignUI();
+                refreshCurrentQR();
+            });
+        });
+
+        // カスタム画像アップロード
+        const customLogoFile = document.getElementById('custom-logo-file');
+        const customLogoFilename = document.getElementById('custom-logo-filename');
+        const customLogoClear = document.getElementById('custom-logo-clear');
+
+        if (customLogoFile) {
+            customLogoFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (customLogoFilename) customLogoFilename.textContent = file.name;
+                if (customLogoClear) customLogoClear.style.display = 'inline-block';
+
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        designOptions.customLogoImage = img;
+                        refreshCurrentQR();
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (customLogoClear) {
+            customLogoClear.addEventListener('click', () => {
+                if (customLogoFile) customLogoFile.value = '';
+                if (customLogoFilename) customLogoFilename.textContent = '';
+                customLogoClear.style.display = 'none';
+                designOptions.customLogoImage = null;
+                refreshCurrentQR();
+            });
+        }
+    };
+
     // 言語適用関数
     const applyLanguage = (lang) => {
         currentLang = lang;
@@ -298,6 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateThemeToggleUI(document.documentElement.getAttribute('data-theme') || 'dark');
         updateLangSelectUI(currentSetting);
+        updateDesignUI();
     };
 
     const setLanguageSetting = (setting) => {
@@ -316,9 +862,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setLanguageSetting(langSelect.value);
         });
     }
-
-    // 初期言語の適用
-    applyLanguage(currentLang);
 
     // タブ必須項目のマッピング
     const requiredInputs = {
@@ -367,6 +910,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentType = targetType;
             updateRequiredAttributes(currentType);
+
+            // タイプアイコンモードの場合、タブ切り替えに合わせてリアルタイム更新
+            if (designOptions.logoType === 'icon') {
+                refreshCurrentQR();
+            }
         });
     });
 
@@ -479,17 +1027,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return { qrText, labelText };
     };
 
-    // テキストを描画可能な長さに省略するヘルパー
-    const truncateText = (ctx, text, maxWidth) => {
-        if (ctx.measureText(text).width <= maxWidth) {
-            return text;
-        }
-        let truncated = text;
-        while (truncated.length > 0 && ctx.measureText(truncated + '...').width > maxWidth) {
-            truncated = truncated.slice(0, -1);
-        }
-        return truncated + '...';
-    };
+    // デザインコントロールの初期化
+    setupDesignListeners();
+    updateDesignUI();
+
+    // 初期言語の適用
+    applyLanguage(currentLang);
 
     // フォーム送信（QRコード生成）
     qrForm.addEventListener('submit', (event) => {
@@ -501,16 +1044,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // 既存のQRコード表示をクリア
         qrCodeDiv.innerHTML = '';
 
-        // 一時コンテナでQRCode.jsを実行
+        // 一時コンテナでQRCode.jsを実行してマトリクスモデルを生成
         const tempContainer = document.createElement('div');
         const t = i18n[currentLang] || i18n.en;
+        let qrInstance = null;
         try {
-            new QRCode(tempContainer, {
+            qrInstance = new QRCode(tempContainer, {
                 text: qrText,
                 width: 256,
                 height: 256,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H
             });
         } catch (err) {
@@ -519,53 +1061,25 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // canvasの描画完了を待つ
-        const checkCanvas = () => {
-            const qrCanvas = tempContainer.querySelector('canvas');
-            if (!qrCanvas) {
-                setTimeout(checkCanvas, 20);
-                return;
-            }
+        const qrModel = qrInstance._oQRCode;
+        if (!qrModel) {
+            showToast(t.toasts.genFailed);
+            return;
+        }
 
-            const qrSize = qrCanvas.width || 256;
-            const hasLabel = labelText.length > 0;
-            const labelHeight = hasLabel ? 36 : 0;
-            const padding = 16;
+        lastGeneratedQRModel = qrModel;
+        lastGeneratedLabel = labelText;
 
-            const finalCanvas = document.createElement('canvas');
-            finalCanvas.width = qrSize + (padding * 2);
-            finalCanvas.height = qrSize + labelHeight + (padding * 2);
-            const ctx = finalCanvas.getContext('2d');
+        // カスタムデザインでCanvasを描画
+        const finalCanvas = renderCustomQRCode(qrModel, designOptions, labelText, currentType);
 
-            // 背景を白で塗りつぶす
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        // 画面に表示
+        qrCodeDiv.appendChild(finalCanvas);
+        qrCodeResultContainer.classList.remove('hidden');
+        currentCanvas = finalCanvas;
 
-            // ラベルの描画
-            if (hasLabel) {
-                ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
-                ctx.fillStyle = '#121212';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                const maxLabelWidth = finalCanvas.width - (padding * 2);
-                const displayLabel = truncateText(ctx, labelText, maxLabelWidth);
-                ctx.fillText(displayLabel, finalCanvas.width / 2, padding + (labelHeight / 2));
-            }
-
-            // QRコード本体を描画
-            ctx.drawImage(qrCanvas, padding, padding + labelHeight);
-
-            // 画面に表示
-            qrCodeDiv.appendChild(finalCanvas);
-            qrCodeResultContainer.classList.remove('hidden');
-            currentCanvas = finalCanvas;
-
-            // スクロールして表示
-            qrCodeResultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        };
-
-        setTimeout(checkCanvas, 30);
+        // スクロールして表示
+        qrCodeResultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 
     // トースト通知表示
@@ -622,4 +1136,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-

@@ -15,6 +15,12 @@ A modern, responsive, and privacy-friendly web application to generate QR codes 
   - ✉️ **Email**: Pre-filled recipient, subject, and body templates.
   - 📞 **Phone**: Direct dial phone numbers.
   - 📇 **Contact (vCard)**: Digital business cards with name, organization, job title, phone, email, and website.
+- **🎨 Stylish Custom QR Code Design**:
+  - **Design Presets**: One-click professional styles (Classic Black, Ocean Blue, Sunset Glow, Emerald Nature, Cyber Purple, Rose Gold).
+  - **Dot Styles**: Square, Rounded corners, or Circular dots.
+  - **Eye (Corner) Styles**: Square, Rounded, or Circular finder patterns.
+  - **Colors & Gradients**: Solid colors or custom linear gradients with live color pickers.
+  - **Center Logo / Icon**: Embed QR type icons (🌐/📶/✉️/📞/📇) or upload custom logo images with high error-correction (Level H: 30%).
 - **Custom Image Label**: Add an optional descriptive header label embedded directly above the generated QR code.
 - **Export & Share**:
   - 💾 **Download PNG**: Save the high-resolution QR code image locally.
