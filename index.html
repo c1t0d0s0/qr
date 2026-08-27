@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wi-Fi QR Code Generator</title>
+    <title>QR Code Generator</title>
     <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
     <!-- Google tag (gtag.js) -->
@@ -23,26 +23,183 @@
 </head>
 <body>
     <div class="container">
-        <h1>Wi-Fi QR Code Generator</h1>
-        <form id="wifi-form">
-            <div class="form-group">
-                <label for="ssid">SSID</label>
-                <input type="text" id="ssid" name="ssid" required>
+        <header class="app-header">
+            <h1>QR Code Generator</h1>
+            <p class="subtitle">URL、テキスト、Wi-Fi、連絡先などのQRコードを簡単に作成</p>
+        </header>
+
+        <!-- タイプ選択タブ -->
+        <nav class="type-tabs" aria-label="QR Code Type">
+            <button type="button" class="tab-btn active" data-type="url">
+                <span class="tab-icon">🌐</span>
+                <span class="tab-label">URL</span>
+            </button>
+            <button type="button" class="tab-btn" data-type="text">
+                <span class="tab-icon">📝</span>
+                <span class="tab-label">テキスト</span>
+            </button>
+            <button type="button" class="tab-btn" data-type="wifi">
+                <span class="tab-icon">📶</span>
+                <span class="tab-label">Wi-Fi</span>
+            </button>
+            <button type="button" class="tab-btn" data-type="email">
+                <span class="tab-icon">✉️</span>
+                <span class="tab-label">メール</span>
+            </button>
+            <button type="button" class="tab-btn" data-type="phone">
+                <span class="tab-icon">📞</span>
+                <span class="tab-label">電話</span>
+            </button>
+            <button type="button" class="tab-btn" data-type="vcard">
+                <span class="tab-icon">📇</span>
+                <span class="tab-label">連絡先</span>
+            </button>
+        </nav>
+
+        <!-- メインフォーム -->
+        <form id="qr-form">
+            <!-- 1. URL フォーム -->
+            <div class="tab-content active" id="content-url">
+                <div class="form-group">
+                    <label for="url-input">URL <span class="required">*</span></label>
+                    <input type="url" id="url-input" placeholder="https://example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="url-label">画像上部ラベル (任意)</label>
+                    <input type="text" id="url-label" placeholder="例: 公式サイト">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+
+            <!-- 2. テキスト フォーム -->
+            <div class="tab-content" id="content-text">
+                <div class="form-group">
+                    <label for="text-input">テキスト <span class="required">*</span></label>
+                    <textarea id="text-input" rows="4" placeholder="QRコードに変換したいテキストを入力してください"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="text-label">画像上部ラベル (任意)</label>
+                    <input type="text" id="text-label" placeholder="例: メモ">
+                </div>
             </div>
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="hidden" name="hidden">
-                <label for="hidden">Hidden SSID</label>
+
+            <!-- 3. Wi-Fi フォーム -->
+            <div class="tab-content" id="content-wifi">
+                <div class="form-group">
+                    <label for="wifi-ssid">SSID (ネットワーク名) <span class="required">*</span></label>
+                    <input type="text" id="wifi-ssid" placeholder="Wi-FiのSSID">
+                </div>
+                <div class="form-group">
+                    <label for="wifi-password">パスワード</label>
+                    <input type="password" id="wifi-password" placeholder="Wi-Fiパスワード">
+                </div>
+                <div class="form-group">
+                    <label for="wifi-auth">セキュリティ (暗号化方式)</label>
+                    <select id="wifi-auth">
+                        <option value="WPA" selected>WPA / WPA2 / WPA3</option>
+                        <option value="WEP">WEP</option>
+                        <option value="nopass">なし (オープンネットワーク)</option>
+                    </select>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="wifi-hidden">
+                    <label for="wifi-hidden">非公開ネットワーク (ステルスSSID)</label>
+                </div>
+                <div class="form-group">
+                    <label for="wifi-label">画像上部ラベル (空欄時はSSIDを使用)</label>
+                    <input type="text" id="wifi-label" placeholder="空欄時はSSIDがラベルになります">
+                </div>
             </div>
-            <button type="submit">Generate QR Code</button>
+
+            <!-- 4. メール フォーム -->
+            <div class="tab-content" id="content-email">
+                <div class="form-group">
+                    <label for="email-to">宛先メールアドレス <span class="required">*</span></label>
+                    <input type="email" id="email-to" placeholder="info@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="email-subject">件名 (任意)</label>
+                    <input type="text" id="email-subject" placeholder="お問い合わせ件名">
+                </div>
+                <div class="form-group">
+                    <label for="email-body">本文 (任意)</label>
+                    <textarea id="email-body" rows="3" placeholder="メールの本文テンプレート"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="email-label">画像上部ラベル (任意)</label>
+                    <input type="text" id="email-label" placeholder="例: お問い合わせ窓口">
+                </div>
+            </div>
+
+            <!-- 5. 電話 フォーム -->
+            <div class="tab-content" id="content-phone">
+                <div class="form-group">
+                    <label for="phone-number">電話番号 <span class="required">*</span></label>
+                    <input type="tel" id="phone-number" placeholder="09012345678 または +819012345678">
+                </div>
+                <div class="form-group">
+                    <label for="phone-label">画像上部ラベル (任意)</label>
+                    <input type="text" id="phone-label" placeholder="例: カスタマーサポート">
+                </div>
+            </div>
+
+            <!-- 6. 連絡先 (vCard) フォーム -->
+            <div class="tab-content" id="content-vcard">
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="vcard-lastname">姓 <span class="required">*</span></label>
+                        <input type="text" id="vcard-lastname" placeholder="山田">
+                    </div>
+                    <div class="form-group col">
+                        <label for="vcard-firstname">名</label>
+                        <input type="text" id="vcard-firstname" placeholder="太郎">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vcard-org">会社名 / 組織 (任意)</label>
+                    <input type="text" id="vcard-org" placeholder="株式会社〇〇">
+                </div>
+                <div class="form-group">
+                    <label for="vcard-title">役職 / 肩書 (任意)</label>
+                    <input type="text" id="vcard-title" placeholder="代表取締役 / マネージャー">
+                </div>
+                <div class="form-group">
+                    <label for="vcard-phone">電話番号 (任意)</label>
+                    <input type="tel" id="vcard-phone" placeholder="03-1234-5678">
+                </div>
+                <div class="form-group">
+                    <label for="vcard-email">メールアドレス (任意)</label>
+                    <input type="email" id="vcard-email" placeholder="yamada@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="vcard-url">Webサイト (任意)</label>
+                    <input type="url" id="vcard-url" placeholder="https://example.com">
+                </div>
+                <div class="form-group">
+                    <label for="vcard-label">画像上部ラベル (任意)</label>
+                    <input type="text" id="vcard-label" placeholder="空欄時は氏名を使用">
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="generate-btn">QRコードを生成</button>
         </form>
-        <div id="qrcode-container">
+
+        <!-- QRコード生成結果エリア -->
+        <div id="qrcode-container" class="hidden">
             <div id="qrcode"></div>
+            <div class="action-buttons">
+                <button type="button" id="download-btn" class="action-btn download-btn">
+                    <span>💾</span> PNG保存
+                </button>
+                <button type="button" id="copy-btn" class="action-btn copy-btn">
+                    <span>📋</span> 画像コピー
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- トースト通知 -->
+    <div id="toast" class="toast hidden"></div>
+
     <script src="qrcode.min.js"></script>
     <script src="script.js"></script>
 </body>
