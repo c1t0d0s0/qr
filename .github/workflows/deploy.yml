@@ -27,6 +27,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Inject GTM_ID
+        env:
+          GTM_ID: ${{ vars.GTM_ID || secrets.GTM_ID || env.GTM_ID }}
+        run: |
+          if [ -n "$GTM_ID" ]; then
+            echo "Injecting GTM_ID into config.js"
+            echo "const GTM_ID = '${GTM_ID}';" > config.js
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
