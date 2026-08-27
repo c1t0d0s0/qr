@@ -20,11 +20,27 @@
         gtag('config', GTM_ID);
       }
     </script>
-    <!-- Theme initialization -->
+    <!-- Theme & Language initialization -->
     <script>
       (function() {
         const savedTheme = localStorage.getItem('qr_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
+
+        const savedLang = localStorage.getItem('qr_lang') || 'auto';
+        let effectiveLang = 'en';
+        if (savedLang === 'ja' || savedLang === 'en') {
+            effectiveLang = savedLang;
+        } else {
+            const primary = (navigator.languages && navigator.languages.length > 0)
+                ? navigator.languages[0]
+                : (navigator.language || navigator.userLanguage || navigator.browserLanguage || '');
+            if (typeof primary === 'string' && primary.toLowerCase().trim().startsWith('ja')) {
+                effectiveLang = 'ja';
+            } else {
+                effectiveLang = 'en';
+            }
+        }
+        document.documentElement.lang = effectiveLang;
       })();
     </script>
 </head>
@@ -32,40 +48,50 @@
     <div class="container">
         <header class="app-header">
             <div class="header-top">
-                <h1>QR Code Generator</h1>
-                <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="ライトモードに切り替え" title="ライトモードに切り替え">
-                    <span class="theme-icon theme-icon-light" aria-hidden="true">☀️</span>
-                    <span class="theme-icon theme-icon-dark" aria-hidden="true">🌙</span>
-                </button>
+                <h1 data-i18n="appTitle">QR Code Generator</h1>
+                <div class="header-actions">
+                    <div class="lang-select-container">
+                        <span class="lang-globe-icon" aria-hidden="true">🌐</span>
+                        <select id="lang-select" class="header-action-select lang-select" aria-label="言語選択 / Language">
+                            <option value="auto">Auto</option>
+                            <option value="ja">日本語</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <button type="button" id="theme-toggle" class="header-action-btn theme-toggle-btn" aria-label="ライトモードに切り替え" title="ライトモードに切り替え">
+                        <span class="theme-icon theme-icon-light" aria-hidden="true">☀️</span>
+                        <span class="theme-icon theme-icon-dark" aria-hidden="true">🌙</span>
+                    </button>
+                </div>
             </div>
-            <p class="subtitle">URL、テキスト、Wi-Fi、連絡先などのQRコードを簡単に作成</p>
+            <p class="subtitle" data-i18n="appSubtitle">URL、テキスト、Wi-Fi、連絡先などのQRコードを簡単に作成</p>
         </header>
 
         <!-- タイプ選択タブ -->
-        <nav class="type-tabs" role="tablist" aria-label="QR Code Type">
+        <nav class="type-tabs" role="tablist" aria-label="QR Code Type" data-i18n-aria-label="tabs.ariaLabel">
             <button type="button" class="tab-btn active" data-type="url" role="tab" aria-selected="true" id="tab-url" aria-controls="content-url">
                 <span class="tab-icon">🌐</span>
-                <span class="tab-label">URL</span>
+                <span class="tab-label" data-i18n="tabs.url">URL</span>
             </button>
             <button type="button" class="tab-btn" data-type="text" role="tab" aria-selected="false" id="tab-text" aria-controls="content-text">
                 <span class="tab-icon">📝</span>
-                <span class="tab-label">テキスト</span>
+                <span class="tab-label" data-i18n="tabs.text">テキスト</span>
             </button>
             <button type="button" class="tab-btn" data-type="wifi" role="tab" aria-selected="false" id="tab-wifi" aria-controls="content-wifi">
                 <span class="tab-icon">📶</span>
-                <span class="tab-label">Wi-Fi</span>
+                <span class="tab-label" data-i18n="tabs.wifi">Wi-Fi</span>
             </button>
             <button type="button" class="tab-btn" data-type="email" role="tab" aria-selected="false" id="tab-email" aria-controls="content-email">
                 <span class="tab-icon">✉️</span>
-                <span class="tab-label">メール</span>
+                <span class="tab-label" data-i18n="tabs.email">メール</span>
             </button>
             <button type="button" class="tab-btn" data-type="phone" role="tab" aria-selected="false" id="tab-phone" aria-controls="content-phone">
                 <span class="tab-icon">📞</span>
-                <span class="tab-label">電話</span>
+                <span class="tab-label" data-i18n="tabs.phone">電話</span>
             </button>
             <button type="button" class="tab-btn" data-type="vcard" role="tab" aria-selected="false" id="tab-vcard" aria-controls="content-vcard">
                 <span class="tab-icon">📇</span>
-                <span class="tab-label">連絡先</span>
+                <span class="tab-label" data-i18n="tabs.vcard">連絡先</span>
             </button>
         </nav>
 
@@ -74,84 +100,84 @@
             <!-- 1. URL フォーム -->
             <div class="tab-content active" id="content-url" role="tabpanel" aria-labelledby="tab-url">
                 <div class="form-group">
-                    <label for="url-input">URL <span class="required">*</span></label>
-                    <input type="url" id="url-input" placeholder="https://example.com" required>
+                    <label for="url-input" data-i18n-html="labels.urlRequired">URL <span class="required">*</span></label>
+                    <input type="url" id="url-input" placeholder="https://example.com" data-i18n-placeholder="placeholders.urlInput" required>
                 </div>
                 <div class="form-group">
-                    <label for="url-label">画像上部ラベル (任意)</label>
-                    <input type="text" id="url-label" placeholder="例: 公式サイト">
+                    <label for="url-label" data-i18n="labels.topLabelOptional">画像上部ラベル (任意)</label>
+                    <input type="text" id="url-label" placeholder="例: 公式サイト" data-i18n-placeholder="placeholders.urlLabel">
                 </div>
             </div>
 
             <!-- 2. テキスト フォーム -->
             <div class="tab-content" id="content-text" role="tabpanel" aria-labelledby="tab-text">
                 <div class="form-group">
-                    <label for="text-input">テキスト <span class="required">*</span></label>
-                    <textarea id="text-input" rows="4" placeholder="QRコードに変換したいテキストを入力してください"></textarea>
+                    <label for="text-input" data-i18n-html="labels.textRequired">テキスト <span class="required">*</span></label>
+                    <textarea id="text-input" rows="4" placeholder="QRコードに変換したいテキストを入力してください" data-i18n-placeholder="placeholders.textInput"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="text-label">画像上部ラベル (任意)</label>
-                    <input type="text" id="text-label" placeholder="例: メモ">
+                    <label for="text-label" data-i18n="labels.topLabelOptional">画像上部ラベル (任意)</label>
+                    <input type="text" id="text-label" placeholder="例: メモ" data-i18n-placeholder="placeholders.textLabel">
                 </div>
             </div>
 
             <!-- 3. Wi-Fi フォーム -->
             <div class="tab-content" id="content-wifi" role="tabpanel" aria-labelledby="tab-wifi">
                 <div class="form-group">
-                    <label for="wifi-ssid">SSID (ネットワーク名) <span class="required">*</span></label>
-                    <input type="text" id="wifi-ssid" placeholder="Wi-FiのSSID">
+                    <label for="wifi-ssid" data-i18n-html="labels.wifiSsidRequired">SSID (ネットワーク名) <span class="required">*</span></label>
+                    <input type="text" id="wifi-ssid" placeholder="Wi-FiのSSID" data-i18n-placeholder="placeholders.wifiSsid">
                 </div>
                 <div class="form-group">
-                    <label for="wifi-password">パスワード</label>
-                    <input type="password" id="wifi-password" placeholder="Wi-Fiパスワード">
+                    <label for="wifi-password" data-i18n="labels.wifiPassword">パスワード</label>
+                    <input type="password" id="wifi-password" placeholder="Wi-Fiパスワード" data-i18n-placeholder="placeholders.wifiPassword">
                 </div>
                 <div class="form-group">
-                    <label for="wifi-auth">セキュリティ (暗号化方式)</label>
+                    <label for="wifi-auth" data-i18n="labels.wifiAuth">セキュリティ (暗号化方式)</label>
                     <select id="wifi-auth">
-                        <option value="WPA" selected>WPA / WPA2 / WPA3</option>
-                        <option value="WEP">WEP</option>
-                        <option value="nopass">なし (オープンネットワーク)</option>
+                        <option value="WPA" selected data-i18n="selectOptions.wifiAuthWpa">WPA / WPA2 / WPA3</option>
+                        <option value="WEP" data-i18n="selectOptions.wifiAuthWep">WEP</option>
+                        <option value="nopass" data-i18n="selectOptions.wifiAuthNoPass">なし (オープンネットワーク)</option>
                     </select>
                 </div>
                 <div class="form-group checkbox-group">
                     <input type="checkbox" id="wifi-hidden">
-                    <label for="wifi-hidden">非公開ネットワーク (ステルスSSID)</label>
+                    <label for="wifi-hidden" data-i18n="labels.wifiHidden">非公開ネットワーク (ステルスSSID)</label>
                 </div>
                 <div class="form-group">
-                    <label for="wifi-label">画像上部ラベル (空欄時はSSIDを使用)</label>
-                    <input type="text" id="wifi-label" placeholder="空欄時はSSIDがラベルになります">
+                    <label for="wifi-label" data-i18n="labels.wifiLabel">画像上部ラベル (空欄時はSSIDを使用)</label>
+                    <input type="text" id="wifi-label" placeholder="空欄時はSSIDがラベルになります" data-i18n-placeholder="placeholders.wifiLabel">
                 </div>
             </div>
 
             <!-- 4. メール フォーム -->
             <div class="tab-content" id="content-email" role="tabpanel" aria-labelledby="tab-email">
                 <div class="form-group">
-                    <label for="email-to">宛先メールアドレス <span class="required">*</span></label>
-                    <input type="email" id="email-to" placeholder="info@example.com">
+                    <label for="email-to" data-i18n-html="labels.emailToRequired">宛先メールアドレス <span class="required">*</span></label>
+                    <input type="email" id="email-to" placeholder="info@example.com" data-i18n-placeholder="placeholders.emailTo">
                 </div>
                 <div class="form-group">
-                    <label for="email-subject">件名 (任意)</label>
-                    <input type="text" id="email-subject" placeholder="お問い合わせ件名">
+                    <label for="email-subject" data-i18n="labels.emailSubject">件名 (任意)</label>
+                    <input type="text" id="email-subject" placeholder="お問い合わせ件名" data-i18n-placeholder="placeholders.emailSubject">
                 </div>
                 <div class="form-group">
-                    <label for="email-body">本文 (任意)</label>
-                    <textarea id="email-body" rows="3" placeholder="メールの本文テンプレート"></textarea>
+                    <label for="email-body" data-i18n="labels.emailBody">本文 (任意)</label>
+                    <textarea id="email-body" rows="3" placeholder="メールの本文テンプレート" data-i18n-placeholder="placeholders.emailBody"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="email-label">画像上部ラベル (任意)</label>
-                    <input type="text" id="email-label" placeholder="例: お問い合わせ窓口">
+                    <label for="email-label" data-i18n="labels.topLabelOptional">画像上部ラベル (任意)</label>
+                    <input type="text" id="email-label" placeholder="例: お問い合わせ窓口" data-i18n-placeholder="placeholders.emailLabel">
                 </div>
             </div>
 
             <!-- 5. 電話 フォーム -->
             <div class="tab-content" id="content-phone" role="tabpanel" aria-labelledby="tab-phone">
                 <div class="form-group">
-                    <label for="phone-number">電話番号 <span class="required">*</span></label>
-                    <input type="tel" id="phone-number" placeholder="09012345678 または +819012345678">
+                    <label for="phone-number" data-i18n-html="labels.phoneNumberRequired">電話番号 <span class="required">*</span></label>
+                    <input type="tel" id="phone-number" placeholder="09012345678 または +819012345678" data-i18n-placeholder="placeholders.phoneNumber">
                 </div>
                 <div class="form-group">
-                    <label for="phone-label">画像上部ラベル (任意)</label>
-                    <input type="text" id="phone-label" placeholder="例: カスタマーサポート">
+                    <label for="phone-label" data-i18n="labels.topLabelOptional">画像上部ラベル (任意)</label>
+                    <input type="text" id="phone-label" placeholder="例: カスタマーサポート" data-i18n-placeholder="placeholders.phoneLabel">
                 </div>
             </div>
 
@@ -159,51 +185,51 @@
             <div class="tab-content" id="content-vcard" role="tabpanel" aria-labelledby="tab-vcard">
                 <div class="form-row">
                     <div class="form-group col">
-                        <label for="vcard-lastname">姓 <span class="required">*</span></label>
-                        <input type="text" id="vcard-lastname" placeholder="山田">
+                        <label for="vcard-lastname" data-i18n-html="labels.vcardLastNameRequired">姓 <span class="required">*</span></label>
+                        <input type="text" id="vcard-lastname" placeholder="山田" data-i18n-placeholder="placeholders.vcardLastName">
                     </div>
                     <div class="form-group col">
-                        <label for="vcard-firstname">名</label>
-                        <input type="text" id="vcard-firstname" placeholder="太郎">
+                        <label for="vcard-firstname" data-i18n="labels.vcardFirstName">名</label>
+                        <input type="text" id="vcard-firstname" placeholder="太郎" data-i18n-placeholder="placeholders.vcardFirstName">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="vcard-org">会社名 / 組織 (任意)</label>
-                    <input type="text" id="vcard-org" placeholder="株式会社〇〇">
+                    <label for="vcard-org" data-i18n="labels.vcardOrg">会社名 / 組織 (任意)</label>
+                    <input type="text" id="vcard-org" placeholder="株式会社〇〇" data-i18n-placeholder="placeholders.vcardOrg">
                 </div>
                 <div class="form-group">
-                    <label for="vcard-title">役職 / 肩書 (任意)</label>
-                    <input type="text" id="vcard-title" placeholder="代表取締役 / マネージャー">
+                    <label for="vcard-title" data-i18n="labels.vcardTitle">役職 / 肩書 (任意)</label>
+                    <input type="text" id="vcard-title" placeholder="代表取締役 / マネージャー" data-i18n-placeholder="placeholders.vcardTitle">
                 </div>
                 <div class="form-group">
-                    <label for="vcard-phone">電話番号 (任意)</label>
-                    <input type="tel" id="vcard-phone" placeholder="03-1234-5678">
+                    <label for="vcard-phone" data-i18n="labels.vcardPhone">電話番号 (任意)</label>
+                    <input type="tel" id="vcard-phone" placeholder="03-1234-5678" data-i18n-placeholder="placeholders.vcardPhone">
                 </div>
                 <div class="form-group">
-                    <label for="vcard-email">メールアドレス (任意)</label>
-                    <input type="email" id="vcard-email" placeholder="yamada@example.com">
+                    <label for="vcard-email" data-i18n="labels.vcardEmail">メールアドレス (任意)</label>
+                    <input type="email" id="vcard-email" placeholder="yamada@example.com" data-i18n-placeholder="placeholders.vcardEmail">
                 </div>
                 <div class="form-group">
-                    <label for="vcard-url">Webサイト (任意)</label>
-                    <input type="url" id="vcard-url" placeholder="https://example.com">
+                    <label for="vcard-url" data-i18n="labels.vcardUrl">Webサイト (任意)</label>
+                    <input type="url" id="vcard-url" placeholder="https://example.com" data-i18n-placeholder="placeholders.vcardUrl">
                 </div>
                 <div class="form-group">
-                    <label for="vcard-label">画像上部ラベル (任意)</label>
-                    <input type="text" id="vcard-label" placeholder="空欄時は氏名を使用">
+                    <label for="vcard-label" data-i18n="labels.vcardLabel">画像上部ラベル (任意)</label>
+                    <input type="text" id="vcard-label" placeholder="空欄時は氏名を使用" data-i18n-placeholder="placeholders.vcardLabel">
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn" id="generate-btn">QRコードを生成</button>
+            <button type="submit" class="submit-btn" id="generate-btn" data-i18n="buttons.generate">QRコードを生成</button>
         </form>
 
         <!-- QRコード生成結果エリア -->
         <div id="qrcode-container" class="hidden">
             <div id="qrcode"></div>
             <div class="action-buttons">
-                <button type="button" id="download-btn" class="action-btn download-btn">
+                <button type="button" id="download-btn" class="action-btn download-btn" data-i18n-html="buttons.download">
                     <span>💾</span> PNG保存
                 </button>
-                <button type="button" id="copy-btn" class="action-btn copy-btn">
+                <button type="button" id="copy-btn" class="action-btn copy-btn" data-i18n-html="buttons.copy">
                     <span>📋</span> 画像コピー
                 </button>
             </div>

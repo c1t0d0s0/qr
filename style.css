@@ -90,29 +90,96 @@ body {
     margin-bottom: 0;
 }
 
-.theme-toggle-btn {
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.header-action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    height: 36px;
     background-color: var(--background-color);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     color: var(--on-surface-color);
     cursor: pointer;
-    font-size: 1.15rem;
     transition: all 0.2s ease;
-    flex-shrink: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.theme-toggle-btn:hover {
+.lang-select-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.lang-globe-icon {
+    position: absolute;
+    left: 0.55rem;
+    font-size: 0.95rem;
+    pointer-events: none;
+    line-height: 1;
+    z-index: 1;
+}
+
+.lang-select {
+    height: 36px;
+    padding: 0 1.5rem 0 1.85rem;
+    background-color: var(--background-color);
+    color: var(--on-surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239e9ea7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.45rem center;
+}
+
+[data-theme="light"] .lang-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.lang-select:hover {
     background-color: var(--surface-hover);
     border-color: var(--primary-color);
+}
+
+.lang-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: var(--focus-ring);
+}
+
+.lang-select option {
+    background-color: var(--surface-color);
+    color: var(--on-surface-color);
+}
+
+.theme-toggle-btn {
+    width: 36px;
+    font-size: 1.1rem;
+}
+
+.header-action-btn:hover {
+    background-color: var(--surface-hover);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
     transform: scale(1.05);
 }
 
-.theme-toggle-btn:active {
+.header-action-btn:active {
     transform: scale(0.95);
 }
 
@@ -407,7 +474,28 @@ body {
     }
 
     .header-top h1 {
-        font-size: 1.35rem;
+        font-size: 1.25rem;
+    }
+
+    .header-action-btn,
+    .lang-select {
+        height: 32px;
+    }
+
+    .lang-select {
+        padding: 0 1.25rem 0 1.65rem;
+        font-size: 0.75rem;
+        background-position: right 0.35rem center;
+    }
+
+    .lang-globe-icon {
+        left: 0.45rem;
+        font-size: 0.85rem;
+    }
+
+    .theme-toggle-btn {
+        width: 32px;
+        font-size: 0.95rem;
     }
 
     .type-tabs {
