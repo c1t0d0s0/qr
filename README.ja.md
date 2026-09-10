@@ -79,6 +79,7 @@ Google Tag Manager / Google Analytics を利用する場合:
 │   └── workflows/
 │       └── deploy.yml    # GitHub Pages 自動デプロイワークフロー
 ├── config.js             # GTM / Google Analytics 設定ファイル
+├── favicon.ico           # ファビコン (マルチサイズICO)
 ├── index.html            # メインHTML
 ├── qrcode.min.js         # クライアントサイドQRコード生成ライブラリ
 ├── script.js             # アプリケーションロジック（i18n、テーマ、QR生成等）

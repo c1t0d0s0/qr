@@ -81,6 +81,7 @@ If you wish to enable Google Tag Manager / Google Analytics:
 │   └── workflows/
 │       └── deploy.yml    # GitHub Actions Pages deployment workflow
 ├── config.js             # Configuration for GTM / Google Analytics
+├── favicon.ico           # Application favicon (multi-size ICO)
 ├── index.html            # Main HTML layout & structure
 ├── qrcode.min.js         # Client-side QR code generation library
 ├── script.js             # Application logic, i18n, themes, and QR generation
