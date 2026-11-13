@@ -7,18 +7,45 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
-    <!-- Google tag (gtag.js) -->
+    <!-- Google Tag Manager / Google Analytics (gtag.js) -->
     <script>
       if (typeof GTM_ID !== 'undefined' && GTM_ID) {
-        const gtagScript = document.createElement('script');
-        gtagScript.async = true;
-        gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`;
-        document.head.appendChild(gtagScript);
+        const trimmedGtmId = GTM_ID.trim();
+        if (/^GTM-/i.test(trimmedGtmId)) {
+          // Google Tag Manager
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer',trimmedGtmId);
 
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', GTM_ID);
+          const noscript = document.createElement('noscript');
+          const iframe = document.createElement('iframe');
+          iframe.src = `https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(trimmedGtmId)}`;
+          iframe.height = '0';
+          iframe.width = '0';
+          iframe.style.display = 'none';
+          iframe.style.visibility = 'hidden';
+          noscript.appendChild(iframe);
+          if (document.body) {
+            document.body.insertBefore(noscript, document.body.firstChild);
+          } else {
+            document.addEventListener('DOMContentLoaded', function() {
+              document.body.insertBefore(noscript, document.body.firstChild);
+            });
+          }
+        } else {
+          // Google Analytics (gtag.js)
+          const gtagScript = document.createElement('script');
+          gtagScript.async = true;
+          gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(trimmedGtmId)}`;
+          document.head.appendChild(gtagScript);
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', trimmedGtmId);
+        }
       }
     </script>
     <!-- Theme & Language initialization -->
